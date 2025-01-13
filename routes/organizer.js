@@ -31,7 +31,7 @@ router.post('/add', async (req, res) => {
 router.get('/all', async (req, res) => {
     try {
       const organizations = await Organization.find();
-      res.status(200).json(organizations);
+      res.status(200).json({success:true,organization:organizations});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
