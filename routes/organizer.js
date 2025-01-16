@@ -2,60 +2,91 @@ const express = require('express');
 const router = express.Router();
 const Organization = require('../models/organization');
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// Add a new organization
+// Register a new organization
 router.post('/add', async (req, res) => {
-  try {
-    const { name, type, address, contactEmail, password } = req.body;
+  const { name, type, address, contactEmail, password } = req.body;
 
-    if (!name || !type || !contactEmail || !password) {
-      return res.status(400).json({ message: 'Name, type, contact email, and password are required' });
+  try {
+    // Check if organization already exists
+    const existingOrganization = await Organization.findOne({ contactEmail });
+    if (existingOrganization) {
+      return res.status(400).json({ success: false, msg: 'Organization already exists' });
     }
 
-    const hashedPassword = await bcryptjs.hash(password, 10);
+    // Hash the password
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
 
+    // Create new organization
     const newOrganization = new Organization({
       name,
       type,
       address,
       contactEmail,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     await newOrganization.save();
-    res.status(201).json({ message: 'Organization added successfully', organization: newOrganization });
+
+    // Generate JWT token
+    const payload = {
+      organization: { id: newOrganization.id },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.jwtOrgSecret,
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.status(201).json({ success: true, msg: 'Organization registered successfully', token:token });
+      }
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log(error.message);
+    res.status(500).json({ success: false, msg: 'Server Error' });
   }
 });
 
-
-
-
-// Organization login
+// Login an organization
 router.post('/login', async (req, res) => {
+  const { contactEmail, password } = req.body;
+
   try {
-    const { contactEmail, password } = req.body;
-
-    if (!contactEmail || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
-
+    // Check if organization exists
     const organization = await Organization.findOne({ contactEmail });
     if (!organization) {
-      return res.status(404).json({ message: 'Organization not found' });
+      return res.status(400).json({ success: false, msg: 'Organization does not exist' });
     }
 
-    const isPasswordValid = await bcryptjs.compare(password, organization.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    // Check password
+    const isMatch = await bcryptjs.compare(password, organization.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, msg: 'Invalid password' });
     }
 
-    res.status(200).json({ success: true, message: 'Login successful', organization });
+    // Generate JWT token
+    const payload = {
+      organization: { id: organization.id },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.jwtOrgSecret,
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({ success: true, msg: 'Organization logged in', token:token });
+      }
+    );
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log(error.message);
+    res.status(500).json({ success: false, msg: 'Server Error' });
   }
 });
+
 
 
 
