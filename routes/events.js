@@ -74,7 +74,7 @@ router.get("/organizer/:organizerId", async (req, res) => {
             return res.status(404).json({ message: "No competitions found for this organizer" });
         }
 
-        res.status(200).json({ competitions });
+        res.status(200).json({ success:true,competitions });
     } catch (error) {
         console.error("Error fetching competitions:", error);
         res.status(500).json({ message: "Error fetching competitions", error: error.message });
