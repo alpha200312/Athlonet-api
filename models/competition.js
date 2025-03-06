@@ -11,6 +11,7 @@ const competitionSchema = new mongoose.Schema({
   location: { type: String },
   isPrivate: { type: Boolean, default: false }, // Visibility flag
   notifications: { type: Boolean, default: true }, // Enable/Disable notifications for this competition
+  status: { type: String, enum: ['upcoming', 'ongoing', 'completed'], default: 'upcoming' }, // Competition status
   createdAt: { type: Date, default: Date.now },
 });
 

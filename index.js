@@ -10,6 +10,8 @@ connectdb();
 app.use(express.json())
 
 app.use('/api/athlonet/user/auth',router);
+app.use('/api/athlonet/event',require("./routes/events"));
+
 app.use('/api/athlonet/organization',require('./routes/organizer'));
 
 
