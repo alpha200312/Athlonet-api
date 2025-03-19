@@ -1,6 +1,8 @@
 const express=require('express');
 const router = express.Router();
 const User=require("../models/users");
+const auth=require("../middleware/user_jwt");
+
 
 const bcryptjs=require("bcryptjs");
 
@@ -148,6 +150,34 @@ router.post('/register', async (req, res, next) => {
            message: 'Something error occured'
        })
    }
+});
+router.get('/profile', auth, async (req, res, next) => {
+    try {
+        const id = req.user.id; // Extract user ID from request
+        console.log(id);
+
+        // Fetch the user profile from the database
+        const profile = await User.findById(id).select('-password'); // Excluding password for security
+
+        if (!profile) {
+            return res.status(404).json({
+                success: false,
+                message: 'Profile not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            profile
+        });
+
+    } catch (error) {
+        console.log(error); // Log error correctly
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred'
+        });
+    }
 });
 
 module.exports=router;
