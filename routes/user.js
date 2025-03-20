@@ -153,10 +153,8 @@ router.post('/register', async (req, res, next) => {
 });
 router.get('/profile', auth, async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id)
-            .populate('collegeId', 'name') // Get College Name
-            .populate('profile.teams', 'name') // Get Team Names
-            .populate('followedOrganizations', 'name'); // Get Followed Org Names
+        const user = await User.findById(req.user.id);
+            
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
