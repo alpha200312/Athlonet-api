@@ -153,30 +153,34 @@ router.post('/register', async (req, res, next) => {
 });
 router.get('/profile', auth, async (req, res, next) => {
     try {
-        const id = req.user.id; // Extract user ID from request
-        console.log(id);
+        const user = await User.findById(req.user.id)
+            .populate('collegeId', 'name') // Get College Name
+            .populate('profile.teams', 'name') // Get Team Names
+            .populate('followedOrganizations', 'name'); // Get Followed Org Names
 
-        // Fetch the user profile from the database
-        const profile = await User.findById(id).select('-password'); // Excluding password for security
-
-        if (!profile) {
-            return res.status(404).json({
-                success: false,
-                message: 'Profile not found'
-            });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        res.status(200).json({
+        res.json({
             success: true,
-            profile
+            profile: {
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                sport: user.profile.sport || "N/A",
+                age: user.profile.age || 0,
+                experience: user.profile.experience || 0,
+                achievements: user.profile.achievements || [],
+                teams: user.profile.teams.map(team => team.name),
+                followedOrganizations: user.followedOrganizations.map(org => org.name),
+                college: user.collegeId ? user.collegeId.name : "N/A",
+            }
         });
 
-    } catch (error) {
-        console.log(error); // Log error correctly
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred'
-        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
     }
 });
 
