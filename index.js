@@ -8,6 +8,8 @@ const dotenv=require('dotenv')
 dotenv.config({path:"./config/config.env"});
 connectdb();
 app.use(express.json())
+const cors=require('cors');
+app.use(cors());
 
 app.use('/api/athlonet/user/auth',router);
 app.use('/api/athlonet/event',require("./routes/events"));
