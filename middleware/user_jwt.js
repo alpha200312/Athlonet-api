@@ -6,15 +6,16 @@ module.exports = async function(req, res, next) {
     const token = req.header('Authorization');
     console.log(token +"token")
 
-    if(!token) {
-        return res.status(401).json({
-            msg: 'No token, authorization denied'
-        });
-    }
+    // if(!token) {
+    //     return res.status(401).json({
+    //         msg: 'No token, authorization denied'
+    //     });
+    // }
 
     try {
         await jwt.verify(token, process.env.jwtUserSecret, (err, decoded) => {
             if(err) {
+                console.log(err +"inside token error")
                 res.status(401).json({
                     msg: 'Token not valid'
                 });
