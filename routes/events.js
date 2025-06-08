@@ -169,7 +169,7 @@ router.post('/join/:competitionId', auth, async (req, res) => {
 
 
 // POST: Add an announcement to a competition
-router.post('/announcement/:competitionId', auth, async (req, res) => {
+router.post('/announcement/:competitionId',  async (req, res) => {
   const { competitionId } = req.params;
   const { text } = req.body;
 
