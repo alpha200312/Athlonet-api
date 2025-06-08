@@ -139,6 +139,7 @@ router.get('/myCompetitions',auth, async (req, res) => {
 });
 router.post('/join/:competitionId',auth, async (req, res) => {
   try {
+    console.log("inside the comptetion for verfication")
       const { competitionId } = req.params;
       const userId = req.user.id; // ✅ Get user from authentication middleware
 
