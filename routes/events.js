@@ -106,6 +106,25 @@ router.get("/organizer/:organizerId", async (req, res) => {
   }
 });
 
+router.put('/edit/:id', async (req, res) => {
+  try {
+    const updatedCompetition = await Competition.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    if (!updatedCompetition) {
+      return res.status(404).json({ success: false, message: 'Competition not found' });
+    }
+
+    res.status(200).json({ success: true, competition: updatedCompetition });
+  } catch (error) {
+    console.error('Error updating competition:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
 router.get('/myCompetitions',auth, async (req, res) => {
   try {
       const userId = req.user.id; // ✅ Get user from auth middleware
