@@ -4,6 +4,7 @@ module.exports = async function(req, res, next) {
     console.log("inside fuction");
 
     const token = req.header('Authorization');
+    console.log(token +"token")
 
     if(!token) {
         return res.status(401).json({

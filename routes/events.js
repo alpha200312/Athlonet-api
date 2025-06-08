@@ -137,7 +137,7 @@ router.get('/myCompetitions',auth, async (req, res) => {
       res.status(500).json({ message: "Error fetching competitions", error: error.message });
   }
 });
-router.post('/join/:competitionId', async (req, res) => {
+router.post('/join/:competitionId', auth, async (req, res) => {
   try {
     console.log("inside the comptetion for verfication")
       const { competitionId } = req.params;
