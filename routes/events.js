@@ -168,5 +168,58 @@ router.post('/join/:competitionId', auth, async (req, res) => {
 });
 
 
+// POST: Add an announcement to a competition
+router.post('/announcement/:competitionId', auth, async (req, res) => {
+  const { competitionId } = req.params;
+  const { text } = req.body;
+
+  if (!text || text.trim() === '') {
+    return res.status(400).json({ success: false, message: 'Announcement text is required' });
+  }
+
+  try {
+    const competition = await Competition.findById(competitionId);
+    if (!competition) {
+      return res.status(404).json({ success: false, message: 'Competition not found' });
+    }
+
+    competition.announcements.push({ text });
+    await competition.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Announcement added successfully',
+      announcements: competition.announcements
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error while adding announcement',
+      error: error.message
+    });
+  }
+});
+
+// GET: Fetch announcements for a competition
+router.get('/announcement/:competitionId', async (req, res) => {
+  try {
+    const competition = await Competition.findById(req.params.competitionId).select('announcements');
+    if (!competition) {
+      return res.status(404).json({ success: false, message: 'Competition not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      announcements: competition.announcements
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching announcements',
+      error: error.message
+    });
+  }
+});
+
 
 module.exports = router;
