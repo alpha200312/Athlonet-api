@@ -78,7 +78,16 @@ router.post('/login', async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.status(200).json({ success: true, msg: 'Organization logged in', token:token });
+        // res.status(200).json({ success: true, msg: 'Organization logged in', token:token });
+        res.status(200).json({
+  success: true,
+  msg: 'Organization logged in',
+  token: token,
+  isVerified: organization.isVerified,
+  id: organization._id,
+  name: organization.name
+});
+
       }
     );
   } catch (error) {
