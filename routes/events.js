@@ -204,6 +204,8 @@ router.post('/announcement/:competitionId',  async (req, res) => {
 router.get('/announcement/:competitionId', async (req, res) => {
   try {
     const competition = await Competition.findById(req.params.competitionId).select('announcements');
+    console.log("inside announcements log" + competition);
+    
     if (!competition) {
       return res.status(404).json({ success: false, message: 'Competition not found' });
     }
